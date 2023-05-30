@@ -1,0 +1,19 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+
+.main__container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 100px;
+  margin-top: 5px;
+}
+
+@media only screen and (max-width: 1024px) {
+  .main__container {
+    gap: 50px;
+  }
+}

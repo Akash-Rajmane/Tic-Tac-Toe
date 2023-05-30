@@ -1,0 +1,18 @@
+body {
+  margin: 0;
+  font-family: "Permanent Marker", cursive;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #9e9ff3;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+h1 {
+  font-size: 3.2em;
+  line-height: 1.1;
+} 
+

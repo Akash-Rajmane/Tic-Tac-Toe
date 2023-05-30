@@ -1,0 +1,44 @@
+.box {
+  background-color: #f3c507;
+  border: none;
+  border-radius: 10%;
+  box-shadow: 12px 12px 12px #966a31;
+  width: 130px;
+  height: 130px;
+  transition: all 0.2s ease-in-out;
+}
+
+.box:hover {
+  transform: scale(1.1);
+  box-shadow: 20px 20px 20px#966a31;
+  cursor: pointer;
+}
+
+.btn-text {
+  text-align: center;
+  font-size: 60px;
+  text-shadow: 4px 4px 4px #888;
+  font-weight: bold;
+}
+
+.x {
+  color: #ff4625;
+}
+
+.o {
+  color: #2c87ff;
+}
+
+@media only screen and (max-width: 600px) {
+  .box {
+    width: 100px;
+    height: 100px;
+  }
+}
+
+@media only screen and (max-width: 480px) {
+  .box {
+    width: 65px;
+    height: 65px;
+  }
+}

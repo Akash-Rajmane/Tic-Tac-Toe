@@ -1,0 +1,23 @@
+.board__container {
+  display: grid;
+  place-content: center;
+  background-color: #fafa13;
+  padding: 35px;
+  border-radius: 25px;
+  box-shadow: 20px 20px 20px #95971d;
+  border: 2px solid #000;
+}
+
+.board {
+  display: grid;
+  grid-template-columns: auto auto auto;
+  place-items: center;
+  justify-content: center;
+  gap: 15px;
+}
+
+@media only screen and (max-width: 480px) {
+  .board__container {
+    padding: 30px;
+  }
+}
