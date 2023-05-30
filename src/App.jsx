@@ -5,6 +5,7 @@ import Board from "./components/board/Board";
 import ScoreBoard from "./components/scoreboard/ScoreBoard";
 import winningAudio from "./assets/applause.mp3";
 import clickingAudio from "./assets/click.mp3";
+import swooshAudio from "./assets/swoosh.mp3";
 
 function App() {
   const [board, setBoard] = useState(Array(9).fill(null));
@@ -14,6 +15,7 @@ function App() {
   const [result, setResult] = useState("");
   const winAudio = new Audio(winningAudio);
   const clickAudio = new Audio(clickingAudio);
+  const resetAudio = new Audio(swooshAudio);
 
   const WINNING_CONDITIONS = [
     [0, 1, 2],
@@ -82,6 +84,8 @@ function App() {
 
   // Reset the board only
   const resetBoard = () => {
+    // Play the reset ringtone
+    resetAudio.play();
     setIsRoundOver(false);
     setBoard(Array(9).fill(null));
     setResult("");
