@@ -11,7 +11,6 @@ function App() {
   const [board, setBoard] = useState(Array(9).fill(null));
   const [isXPlaying, setIsXPlaying] = useState(true);
   const [scores, setScores] = useState({ xScore: 0, oScore: 0 });
-  const [isRoundOver, setIsRoundOver] = useState(false);
   const [result, setResult] = useState("");
   const winAudio = new Audio(winningAudio);
   const clickAudio = new Audio(clickingAudio);
@@ -29,6 +28,14 @@ function App() {
   ];
 
   const handleBoxClick = (boxIdx) => {
+    //If the game is finished then return
+    if (result) {
+      return;
+    }
+
+    // Play clicking ringtone
+    clickAudio.play();
+
     //Update the board
     let updatedBoard = board.map((val, idx) => {
       if (idx === boxIdx) {
@@ -39,8 +46,6 @@ function App() {
     });
 
     setBoard(updatedBoard);
-    // play clicking ringtone
-    clickAudio.play();
 
     let winner = checkWinner(updatedBoard);
 
@@ -68,7 +73,6 @@ function App() {
 
       // Iterate through winning conditions and check if either player satisfies them
       if (board[x] && board[x] === board[y] && board[y] === board[z]) {
-        setIsRoundOver(true);
         setResult(`${board[x]} wins`);
         return board[x];
       }
@@ -76,7 +80,6 @@ function App() {
 
     // Check if the game is draw
     if (board.every((el) => el !== null)) {
-      setIsRoundOver(true);
       setResult("It's a draw");
       return;
     }
@@ -86,7 +89,6 @@ function App() {
   const resetBoard = () => {
     // Play the reset ringtone
     resetAudio.play();
-    setIsRoundOver(false);
     setBoard(Array(9).fill(null));
     setResult("");
     setIsXPlaying(true);
@@ -102,10 +104,7 @@ function App() {
     <>
       <Header />
       <main className="main__container">
-        <Board
-          board={board}
-          onClick={isRoundOver ? resetBoard : handleBoxClick}
-        />
+        <Board board={board} onClick={handleBoxClick} />
         <ScoreBoard
           scores={scores}
           isXPlaying={isXPlaying}
