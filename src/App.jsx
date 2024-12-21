@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./App.css";
 import Header from "./components/header/Header";
 import Board from "./components/board/Board";
@@ -12,6 +12,8 @@ function App() {
   const [isXPlaying, setIsXPlaying] = useState(true);
   const [scores, setScores] = useState({ xScore: 0, oScore: 0 });
   const [result, setResult] = useState("");
+  const [isComputerPlaying, setIsComputerPlaying] = useState(false); // Toggle computer mode
+
   const winAudio = new Audio(winningAudio);
   const clickAudio = new Audio(clickingAudio);
   const resetAudio = new Audio(swooshAudio);
@@ -27,16 +29,23 @@ function App() {
     [2, 4, 6],
   ];
 
+  useEffect(() => {
+    if (!isXPlaying && isComputerPlaying && !result) {
+      const computerMove = calculateBestMove(board, true).index;
+      setTimeout(() => makeComputerMove(computerMove), 500); // Add delay for better UX
+    }
+  }, [isXPlaying, isComputerPlaying, board, result]);
+
   const handleBoxClick = (boxIdx) => {
-    //If the game is finished then return
-    if (result) {
+    // If the game is finished or the box is already filled, return
+    if (result || board[boxIdx]) {
       return;
     }
 
     // Play clicking ringtone
     clickAudio.play();
 
-    //Update the board
+    // Update the board
     let updatedBoard = board.map((val, idx) => {
       if (idx === boxIdx) {
         return isXPlaying ? "X" : "O";
@@ -47,54 +56,93 @@ function App() {
 
     setBoard(updatedBoard);
 
-    let winner = checkWinner(updatedBoard);
+    const winner = checkWinner(updatedBoard);
 
     if (winner) {
-      // play winning ringtone
-      winAudio.play();
-      if (winner === "X") {
-        let { xScore } = scores;
-        xScore += 1;
-        setScores({ ...scores, xScore });
-      } else {
-        let { oScore } = scores;
-        oScore += 1;
-        setScores({ ...scores, oScore });
-      }
+      handleWinner(winner);
+    } else {
+      setIsXPlaying(!isXPlaying);
     }
-
-    // Change the active player
-    setIsXPlaying(!isXPlaying);
   };
 
   const checkWinner = (board) => {
     for (let i = 0; i < WINNING_CONDITIONS.length; i++) {
       const [x, y, z] = WINNING_CONDITIONS[i];
-
-      // Iterate through winning conditions and check if either player satisfies them
       if (board[x] && board[x] === board[y] && board[y] === board[z]) {
-        setResult(`${board[x]} wins`);
         return board[x];
       }
     }
 
-    // Check if the game is draw
     if (board.every((el) => el !== null)) {
+      return "draw";
+    }
+
+    return null;
+  };
+
+  const handleWinner = (winner) => {
+    if (winner === "draw") {
       setResult("It's a draw");
-      return;
+    } else {
+      winAudio.play();
+      setResult(`${winner} wins`);
+
+      if (winner === "X") {
+        setScores((prev) => ({ ...prev, xScore: prev.xScore + 1 }));
+      } else {
+        setScores((prev) => ({ ...prev, oScore: prev.oScore + 1 }));
+      }
     }
   };
 
-  // Reset the board only
+  const makeComputerMove = (move) => {
+    let updatedBoard = board.map((val, idx) => (idx === move ? "O" : val));
+    // Play clicking ringtone
+    clickAudio.play();
+    setBoard(updatedBoard);
+
+    const winner = checkWinner(updatedBoard);
+    if (winner) {
+      handleWinner(winner);
+    } else {
+      setIsXPlaying(true);
+    }
+  };
+
+  const calculateBestMove = (board, isMaximizing) => {
+    const winner = checkWinner(board);
+    if (winner === "X") return { score: -10 };
+    if (winner === "O") return { score: 10 };
+    if (winner === "draw") return { score: 0 };
+
+    const moves = [];
+    for (let i = 0; i < board.length; i++) {
+      if (board[i] === null) {
+        const newBoard = [...board];
+        newBoard[i] = isMaximizing ? "O" : "X";
+        const result = calculateBestMove(newBoard, !isMaximizing);
+        moves.push({ index: i, score: result.score });
+      }
+    }
+
+    if (isMaximizing) {
+      return moves.reduce((best, move) =>
+        move.score > best.score ? move : best
+      );
+    } else {
+      return moves.reduce((best, move) =>
+        move.score < best.score ? move : best
+      );
+    }
+  };
+
   const resetBoard = () => {
-    // Play the reset ringtone
     resetAudio.play();
     setBoard(Array(9).fill(null));
     setResult("");
     setIsXPlaying(true);
   };
 
-  // Reset the entire game(board+score)
   const resetGame = () => {
     resetBoard();
     setScores({ xScore: 0, oScore: 0 });
@@ -103,6 +151,12 @@ function App() {
   return (
     <>
       <Header />
+      <button
+        onClick={() => setIsComputerPlaying(!isComputerPlaying)}
+        className="btn"
+      >
+        {!isComputerPlaying ? "Play vs Human" : "Play vs Computer"}
+      </button>
       <main className="main__container">
         <Board board={board} onClick={handleBoxClick} />
         <ScoreBoard
