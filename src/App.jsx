@@ -109,7 +109,39 @@ function App() {
     }
   };
 
-  const calculateBestMove = (board, isMaximizing) => {
+  // const calculateBestMove = (board, isMaximizing) => {
+  //   const winner = checkWinner(board);
+  //   if (winner === "X") return { score: -10 };
+  //   if (winner === "O") return { score: 10 };
+  //   if (winner === "draw") return { score: 0 };
+
+  //   const moves = [];
+  //   for (let i = 0; i < board.length; i++) {
+  //     if (board[i] === null) {
+  //       const newBoard = [...board];
+  //       newBoard[i] = isMaximizing ? "O" : "X";
+  //       const result = calculateBestMove(newBoard, !isMaximizing);
+  //       moves.push({ index: i, score: result.score });
+  //     }
+  //   }
+
+  //   if (isMaximizing) {
+  //     return moves.reduce((best, move) =>
+  //       move.score > best.score ? move : best
+  //     );
+  //   } else {
+  //     return moves.reduce((best, move) =>
+  //       move.score < best.score ? move : best
+  //     );
+  //   }
+  // };
+
+  const calculateBestMove = (
+    board,
+    isMaximizing,
+    alpha = -Infinity,
+    beta = Infinity
+  ) => {
     const winner = checkWinner(board);
     if (winner === "X") return { score: -10 };
     if (winner === "O") return { score: 10 };
@@ -120,11 +152,20 @@ function App() {
       if (board[i] === null) {
         const newBoard = [...board];
         newBoard[i] = isMaximizing ? "O" : "X";
-        const result = calculateBestMove(newBoard, !isMaximizing);
+        const result = calculateBestMove(newBoard, !isMaximizing, alpha, beta);
         moves.push({ index: i, score: result.score });
+
+        if (isMaximizing) {
+          alpha = Math.max(alpha, result.score);
+          if (alpha >= beta) break; // Beta cut-off
+        } else {
+          beta = Math.min(beta, result.score);
+          if (beta <= alpha) break; // Alpha cut-off
+        }
       }
     }
 
+    // Select the best move based on maximizing or minimizing
     if (isMaximizing) {
       return moves.reduce((best, move) =>
         move.score > best.score ? move : best
